@@ -1,38 +1,135 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.App-background {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  background-color: #D5E2FC;
+  height: 100vh;
+  width: 100vw;
 }
 
-.App-link {
-  color: #61dafb;
+.App-container {
+  display: flex;
+  flex-direction: row;
+  width: 90%;
+  height: 85%;
+  box-shadow: 10px 10px #FCDCD5;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Box {
+  display: flex;
+  height: 100%;
+}
+
+.User-container{
+  flex-direction: column;
+  background-color: white;
+  width: 20vw;
+}
+
+.Chatbox-container{
+  position: relative;
+  flex-direction: column;
+  /* background-color:; */
+  background-image: url('./assets/images/chat-bg.png');
+  background-size: cover;
+  width: 72vw;
+}
+
+.User-display{
+  border: solid black;
+  border-width: 0 0 2px;
+  margin: .5rem .5rem 0;
+  padding: 0 .1rem;
+}
+
+.Chat-input-container{
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  bottom: 0;
+  background-color:  #FCF0D5;
+  width: 100%;
+  min-height: 8%;
+  height: fit-content;
+  max-height: 20%;
+  overflow: auto;
+}
+
+.Chat-input{
+  border: none;
+  border-radius: 10px;
+  height: fit-content;
+  padding-left: 2%;
+  max-height: 90%;
+  overflow: auto;
+  user-select: text;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.Button-send-chat{
+  position: absolute;
+  bottom: 20%;
+  right: 20%;
+  background-color: #88AFFF;
+}
+
+.talk-bubble {
+	margin: 1%;
+  display: inline-block;
+  position: relative;
+	width: fit-content;
+	height: fit-content;
+	background-color: lightyellow;
+  max-width: 35%;
+  min-width: 10%;
+}
+
+.talktext{
+  padding: 2%;
+	text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: .8rem;
+}
+
+.talktext p{
+  margin: 0;
+  padding : 0 1rem .4rem;
+}
+
+.Chat-time{
+  color: grey;
+  text-align: end;
+}
+
+.round{
+  border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+}
+
+.Avatar-user{
+  margin: 1.5% 1% 0;
+  display: inline-block;
+  position: relative;
+}
+
+.Bubble-chat{
+  display: flex;
+  flex-direction: row; 
+  /* overflow: auto; */
+}
+
+.EditProfileUploadButton{
+  background-color: transparent;
+  color: #2A9F90;
+  margin: 0 auto;
+  width: auto;
+}
+
+#img {
+  border-radius: 50%;
+  margin-left: 10%;
+  object-fit: cover;
 }

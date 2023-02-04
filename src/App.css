@@ -24,19 +24,19 @@
   flex-direction: column;
   background-color: white;
   width: 20vw;
+  overflow: auto;
 }
 
 .Chatbox-container{
   position: relative;
   flex-direction: column;
-  /* background-color:; */
   background-image: url('./assets/images/chat-bg.png');
   background-size: cover;
   width: 72vw;
 }
 
 .User-display{
-  border: solid black;
+  border: solid #D5E2FC;
   border-width: 0 0 2px;
   margin: .5rem .5rem 0;
   padding: 0 .1rem;
@@ -118,7 +118,6 @@
 .Bubble-chat{
   display: flex;
   flex-direction: row; 
-  /* overflow: auto; */
 }
 
 .EditProfileUploadButton{

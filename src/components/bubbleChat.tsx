@@ -8,7 +8,7 @@ type Props = {
   text?: string;
   photo?: string;
   username?: string;
-  time?: string;
+  time?: any;
 };
 
 const items: MenuProps["items"] = [
@@ -34,7 +34,7 @@ function BubbleChat(props: Props) {
     }
   };
 
-  return props?.isMe === false ? (
+  return props.isMe === false ? (
     <div
       className="Bubble-chat"
       style={{
@@ -62,8 +62,9 @@ function BubbleChat(props: Props) {
         <div className="talktext">
           <p style={{ color: "#C59010" }}>{props.username}</p>
           <p>
-            Moving our way back up the right side indented. Uses .round and
-            .right-in
+            {props.text
+              ? props.text
+              : "Moving our way back up the right side indented. Uses .round and .right-in"}
           </p>
           {isMouseHover ? (
             <p className="Chat-time">
@@ -97,7 +98,7 @@ function BubbleChat(props: Props) {
         }}
       >
         <div className="talktext">
-          <p>lorem ipsum</p>
+          <p>{props.text ? props.text : "lorem ipsum"}</p>
           {isMouseHover ? (
             <p className="Chat-time">
               <Dropdown
@@ -112,7 +113,15 @@ function BubbleChat(props: Props) {
               </Dropdown>
             </p>
           ) : (
-            <p className="Chat-time">{moment().format("LT")}</p>
+            <p className="Chat-time">
+              {moment(props.time.toDate())
+                .toDate()
+                .toLocaleTimeString(navigator.language, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+            </p>
           )}
         </div>
       </div>

@@ -1,10 +1,11 @@
 import "./App.css";
 import React from "react";
-import { Input, Button, Avatar, Modal, Spin } from "antd";
+import { Input, Button, Avatar, Modal, Spin, message } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import BubbleChat from "./components/bubbleChat";
 import Firebase from "./firebase/firebase";
 import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import axios from "axios";
 
 const { TextArea } = Input;
 
@@ -31,6 +32,7 @@ function App() {
   const [users, setUsers] = React.useState<any[]>([]);
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(true);
+  const [confirmLoading, setConfirmLoading] = React.useState(false);
 
   const setWindowDimensions = () => {
     setWindowWidth(window.innerWidth);
@@ -43,8 +45,25 @@ function App() {
     };
   }, []);
 
-  function handleSendChat() {
-    setChatText("");
+  async function handleSendChat() {
+    try {
+      setConfirmLoading(true);
+      const sendChat = await axios.post(
+        process.env.REACT_APP_BASE_URL + "/api/v1/chats",
+        {
+          message_text: chatText,
+          username: me.username,
+        }
+      );
+      if (sendChat) {
+        setChatText("");
+      }
+      setConfirmLoading(false);
+    } catch (error) {
+      console.log(error);
+      message.error("Something went wrong. Please contact administrator.");
+      setConfirmLoading(false);
+    }
   }
 
   const handleOk = () => {
@@ -140,6 +159,7 @@ function App() {
                     time={item.time}
                     photo={getPhotoUrl.photo_url}
                     key={index}
+                    id={item.id}
                   />
                 );
               })}
@@ -166,8 +186,7 @@ function App() {
                       return;
                     } else {
                       e.preventDefault();
-                      setChatText("");
-                      // send chat here too
+                      handleSendChat();
                     }
                   }}
                   style={{
@@ -201,6 +220,7 @@ function App() {
         open={isModalOpen}
         onOk={handleOk}
         closable={false}
+        confirmLoading={confirmLoading}
         centered
         footer={[
           <Button

@@ -1,5 +1,6 @@
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Dropdown, MenuProps, message } from "antd";
+import { Avatar, Dropdown, MenuProps, message, Modal } from "antd";
+import axios from "axios";
 import moment from "moment";
 import React from "react";
 
@@ -9,6 +10,7 @@ type Props = {
   photo?: string;
   username?: string;
   time?: any;
+  id?: string;
 };
 
 const items: MenuProps["items"] = [
@@ -21,6 +23,9 @@ const items: MenuProps["items"] = [
 function BubbleChat(props: Props) {
   const [isMouseHover, setIsMouseHover] = React.useState<boolean>(false);
   const [open, setOpen] = React.useState<boolean>(false);
+  const [confirmLoading, setConfirmLoading] = React.useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] =
+    React.useState<boolean>(false);
 
   const handleOpenChange = (flag: boolean) => {
     setOpen(flag);
@@ -29,9 +34,31 @@ function BubbleChat(props: Props) {
   const handleMenuClick: MenuProps["onClick"] = (e) => {
     if (e.key === "delete") {
       setOpen(false);
-      //delete chat
-      message.success("Successfully delete message.");
+      setIsModalDeleteOpen(true);
     }
+  };
+
+  const handleOkDeleteModal = async () => {
+    try {
+      setConfirmLoading(true);
+      const deleteChat = await axios.delete(
+        process.env.REACT_APP_BASE_URL + "/api/v1/chats/" + props.id
+      );
+      if (deleteChat) {
+        setIsModalDeleteOpen(false);
+        message.success("Successfully delete message.");
+      }
+      setConfirmLoading(false);
+    } catch (error) {
+      console.log(error);
+      message.error("Something went wrong. Please contact administrator.");
+      setIsModalDeleteOpen(false);
+      setConfirmLoading(false);
+    }
+  };
+
+  const handleCancelDeleteModal = () => {
+    setIsModalDeleteOpen(false);
   };
 
   return props.isMe === false ? (
@@ -84,6 +111,16 @@ function BubbleChat(props: Props) {
           )}
         </div>
       </div>
+      <Modal
+        title="Confirmation Delete Chat"
+        open={isModalDeleteOpen}
+        onOk={handleOkDeleteModal}
+        onCancel={handleCancelDeleteModal}
+        confirmLoading={confirmLoading}
+        closable
+      >
+        <p>Are you sure want to delete this message ?</p>
+      </Modal>
     </div>
   ) : (
     <div className="Bubble-chat" style={{ justifyContent: "flex-end" }}>

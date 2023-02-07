@@ -77,7 +77,6 @@ function BubbleChat(props: Props) {
         className="talk-bubble tri-right round right-in"
         style={{
           backgroundColor: "white",
-          cursor: isMouseHover ? "pointer" : "none",
         }}
         onMouseOver={() => {
           setIsMouseHover(true);
@@ -93,34 +92,17 @@ function BubbleChat(props: Props) {
               ? props.text
               : "Moving our way back up the right side indented. Uses .round and .right-in"}
           </p>
-          {isMouseHover ? (
-            <p className="Chat-time">
-              <Dropdown
-                menu={{
-                  items,
-                  onClick: handleMenuClick,
-                }}
-                onOpenChange={handleOpenChange}
-                open={open}
-              >
-                <DownOutlined />
-              </Dropdown>
-            </p>
-          ) : (
-            <p className="Chat-time">{moment().format("LT")}</p>
-          )}
+          <p className="Chat-time">
+            {moment(props.time.toDate())
+              .toDate()
+              .toLocaleTimeString(navigator.language, {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
+          </p>
         </div>
       </div>
-      <Modal
-        title="Confirmation Delete Chat"
-        open={isModalDeleteOpen}
-        onOk={handleOkDeleteModal}
-        onCancel={handleCancelDeleteModal}
-        confirmLoading={confirmLoading}
-        closable
-      >
-        <p>Are you sure want to delete this message ?</p>
-      </Modal>
     </div>
   ) : (
     <div className="Bubble-chat" style={{ justifyContent: "flex-end" }}>
@@ -167,6 +149,16 @@ function BubbleChat(props: Props) {
         src={props.photo ? props.photo : null}
         className="Avatar-user"
       />
+      <Modal
+        title="Confirmation Delete Chat"
+        open={isModalDeleteOpen}
+        onOk={handleOkDeleteModal}
+        onCancel={handleCancelDeleteModal}
+        confirmLoading={confirmLoading}
+        closable
+      >
+        <p>Are you sure want to delete this message ?</p>
+      </Modal>
     </div>
   );
 }

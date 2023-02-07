@@ -1,11 +1,17 @@
 import "./App.css";
-import React from "react";
+import React, { useRef } from "react";
 import { Input, Button, Avatar, Modal, Spin, message } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import BubbleChat from "./components/bubbleChat";
 import Firebase from "./firebase/firebase";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  doc as docs,
+} from "firebase/firestore";
 import axios from "axios";
+import moment from "moment";
 
 const { TextArea } = Input;
 
@@ -18,7 +24,7 @@ type messageType = {
   id: string;
   username: string;
   message_text: string;
-  time: any;
+  time: Date;
 };
 
 function App() {
@@ -33,6 +39,7 @@ function App() {
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(true);
   const [confirmLoading, setConfirmLoading] = React.useState(false);
+  const ref = useChatAutoScroll(messages);
 
   const setWindowDimensions = () => {
     setWindowWidth(window.innerWidth);
@@ -53,6 +60,7 @@ function App() {
         {
           message_text: chatText,
           username: me.username,
+          time: new Date(),
         }
       );
       if (sendChat) {
@@ -70,18 +78,30 @@ function App() {
     setIsModalOpen(false);
   };
 
+  function useChatAutoScroll<T>(
+    dep: T
+  ): React.MutableRefObject<HTMLDivElement | null> {
+    const ref = useRef<HTMLDivElement | null>(null);
+    React.useEffect(() => {
+      if (ref.current) {
+        ref.current.scrollTop = ref.current.scrollHeight;
+      }
+    }, [dep]);
+    return ref;
+  }
+
   React.useEffect(() => {
     const unsub = onSnapshot(
       collection(getFirestore(app), "messages"),
       async (document) => {
-        const documentData = document.docs;
-        if (documentData) {
-          documentData.forEach((doc) => {
-            setMessages((oldArray) => [
-              ...oldArray,
-              { ...doc.data(), id: doc.id },
-            ]);
-          });
+        const listOfMessage: any[] = [];
+        if (document.docs) {
+          for (const doc of document.docs) {
+            listOfMessage.push({ ...doc.data(), id: doc.id });
+          }
+          const sortedMessages = listOfMessage.sort((a, b) => a.time - b.time);
+          // console.log("sortedMessages", sortedMessages);
+          setMessages(sortedMessages);
         }
       }
     );
@@ -93,14 +113,12 @@ function App() {
     const unsub = onSnapshot(
       collection(getFirestore(app), "users"),
       async (document) => {
-        const documentData = document.docs;
-        if (documentData) {
-          documentData.forEach((doc) => {
-            setUsers((oldArray) => [
-              ...oldArray,
-              { ...doc.data(), id: doc.id },
-            ]);
-          });
+        const listOfUser: any[] = [];
+        if (document.docs) {
+          for (const doc of document.docs) {
+            listOfUser.push({ ...doc.data(), id: doc.id });
+          }
+          setUsers(listOfUser);
         }
       }
     );
@@ -141,7 +159,7 @@ function App() {
             })}
           </div>
           <div className="Box Chatbox-container">
-            <div style={{ overflow: "auto", paddingBottom: "5rem" }}>
+            <div style={{ overflow: "auto", paddingBottom: "5rem" }} ref={ref}>
               {messages.map((item: messageType, index: number) => {
                 const getPhotoUrl: userType = users.find(
                   (data: userType) =>
@@ -157,7 +175,7 @@ function App() {
                     username={item.username}
                     text={item.message_text}
                     time={item.time}
-                    photo={getPhotoUrl.photo_url}
+                    photo={getPhotoUrl ? getPhotoUrl.photo_url : ""}
                     key={index}
                     id={item.id}
                   />

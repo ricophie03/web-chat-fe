@@ -13,17 +13,21 @@ import { getAnalytics } from "firebase/analytics";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
 
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  // apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: "AIzaSyAiwKMzlwMPpm-WWc0PuYkUFpBIUpYaPMk",
 
   authDomain: "simpe-web-chat.firebaseapp.com",
 
+  // projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
   projectId: "simpe-web-chat",
 
+  // storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   storageBucket: "simpe-web-chat.appspot.com",
 
   messagingSenderId: "572827711415",
 
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  // appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  appId: "1:572827711415:web:caa35924586ae90df09a32",
 
   measurementId: "G-9P2CN811B8"
 

@@ -4,19 +4,14 @@ import { Input, Button, Avatar, Modal, Spin, message } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import BubbleChat from "./components/bubbleChat";
 import Firebase from "./firebase/firebase";
-import {
-  collection,
-  getFirestore,
-  onSnapshot,
-  doc as docs,
-} from "firebase/firestore";
+import { collection, getFirestore, onSnapshot } from "firebase/firestore";
 import axios from "axios";
-import moment from "moment";
 
 const { TextArea } = Input;
 
 type userType = {
   username: string;
+  photo_preview_url: string;
   photo_url: string;
 };
 
@@ -31,6 +26,7 @@ function App() {
   const { app } = Firebase();
   const [me, setMe] = React.useState<userType>({
     username: "",
+    photo_preview_url: "",
     photo_url: "",
   });
   const [chatText, setChatText] = React.useState<string>("");
@@ -56,7 +52,8 @@ function App() {
     try {
       setConfirmLoading(true);
       const sendChat = await axios.post(
-        process.env.REACT_APP_BASE_URL + "/api/v1/chats",
+        (process.env.REACT_APP_BASE_URL || "http://localhost:3000") +
+          "/api/v1/chats",
         {
           message_text: chatText,
           username: me.username,
@@ -74,8 +71,43 @@ function App() {
     }
   }
 
-  const handleOk = () => {
-    setIsModalOpen(false);
+  const handleOk = async () => {
+    try {
+      setConfirmLoading(true);
+      if (me.photo_preview_url !== "") {
+        const uploadUser = await axios.post(
+          (process.env.REACT_APP_BASE_URL || "http://localhost:3000") +
+            "/api/v1/users",
+          {
+            image_name: me.photo_url,
+            username: me.username,
+          }
+        );
+      } else {
+        if (
+          users.some(
+            (data) => data.username.toLowerCase() === me.username.toLowerCase()
+          )
+        ) {
+          // console.log("user sudah ada");
+        } else {
+          const uploadUser = await axios.post(
+            (process.env.REACT_APP_BASE_URL || "http://localhost:3000") +
+              "/api/v1/users",
+            {
+              username: me.username,
+            }
+          );
+        }
+      }
+      setConfirmLoading(false);
+      setIsModalOpen(false);
+    } catch (error) {
+      setConfirmLoading(false);
+      message.error("Something went wrong. Please contact administrator.");
+      me.photo_url = "";
+      me.photo_preview_url = "";
+    }
   };
 
   function useChatAutoScroll<T>(
@@ -134,7 +166,7 @@ function App() {
         <div className="App-container">
           <div className="Box User-container">
             <div style={{ fontSize: "1.5rem", marginLeft: ".5rem" }}>
-              Current User :{" "}
+              User :{" "}
             </div>
             {users.map((item: userType, index: number) => {
               return (
@@ -196,6 +228,7 @@ function App() {
                   placeholder="Click Send Button or Press Enter to send message"
                   value={chatText}
                   autoSize
+                  disabled={confirmLoading}
                   onChange={(e) => {
                     setChatText(e.target.value);
                   }}
@@ -226,6 +259,7 @@ function App() {
                   icon={<SendOutlined />}
                   size={"middle"}
                   onClick={handleSendChat}
+                  disabled={confirmLoading}
                 />
               </div>
             </div>
@@ -246,6 +280,7 @@ function App() {
             type="primary"
             disabled={me.username ? false : true}
             onClick={handleOk}
+            loading={confirmLoading}
           >
             Submit
           </Button>,
@@ -260,6 +295,8 @@ function App() {
               username: e.target.value,
             });
           }}
+          autoFocus={true}
+          disabled={confirmLoading}
           required
         />
         <h4>User Profile (Optional)</h4>
@@ -268,12 +305,15 @@ function App() {
           onClick={function () {
             document.getElementById("selectedFile")?.click();
           }}
+          disabled={confirmLoading}
         >
           Upload
         </button>
         <img
           id="img"
-          alt={me.photo_url !== "" ? "User Profile" : "No Picture Selected"}
+          alt={
+            me.photo_preview_url !== "" ? "User Profile" : "No Picture Selected"
+          }
           width={50}
           height={50}
         ></img>
@@ -295,7 +335,8 @@ function App() {
               img!.src = reader.result!.toString();
               setMe({
                 ...me,
-                photo_url: reader.result!.toString(),
+                photo_preview_url: reader.result!.toString(),
+                photo_url: event.target.files![0].name,
               });
             });
             reader.readAsDataURL(event.target.files![0]);
